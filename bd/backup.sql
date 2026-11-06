@@ -201,3 +201,23 @@ GRANT USAGE ON SCHEMA biblioteca TO rl_consulta;
 GRANT SELECT ON biblioteca.livro TO rl_consulta;
 GRANT SELECT ON biblioteca.vw_livros_disponiveis TO rl_consulta;
 
+-- ============ SEEDS ============
+-- Operadores (senha com hash bcrypt, compativel com BCryptPasswordEncoder)
+INSERT INTO biblioteca.operador (nome, email, senha_hash, perfil) VALUES
+ ('Administrador', 'admin@biblioteca.local',
+   extensions.crypt('admin123', extensions.gen_salt('bf')), 'ADMIN'),
+ ('Atendente', 'atendente@biblioteca.local',
+   extensions.crypt('atendente123', extensions.gen_salt('bf')), 'ATENDENTE');
+
+INSERT INTO biblioteca.livro (titulo, autor, isbn, exemplares_total, exemplares_disponiveis) VALUES
+ ('Dom Casmurro',        'Machado de Assis', '9788535911664', 3, 3),
+ ('Vidas Secas',         'Graciliano Ramos', '9788501117649', 2, 2),
+ ('O Cortico',           'Aluisio Azevedo',  '9788572326964', 2, 2);
+
+INSERT INTO biblioteca.leitor (nome, cpf_cript, email) VALUES
+ ('Maria Teste', extensions.pgp_sym_encrypt('12345678900', 'chave-secreta'), 'maria@teste.com'),
+ ('Joao Teste',  extensions.pgp_sym_encrypt('98765432100', 'chave-secreta'), 'joao@teste.com');
+
+-- Emprestimo ja atrasado (6 dias) para a demonstracao da devolucao com multa
+INSERT INTO biblioteca.emprestimo (livro_id, leitor_id, operador_id, data_emprestimo, data_prevista)
+VALUES (1, 1, 2, CURRENT_DATE - 20, CURRENT_DATE - 6);
