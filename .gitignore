@@ -1,0 +1,19 @@
+# Dados fisicos do PostgreSQL (proibido versionar)
+pgdata/
+data/
+bd/data/
+/var/lib/postgresql/
+
+# Ambiente
+.env
+*.log
+
+# Backend
+backend/target/
+.idea/
+.vscode/
+*.iml
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
