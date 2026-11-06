@@ -66,3 +66,53 @@ CREATE TABLE audit.log_emprestimo (
     data_hora     TIMESTAMP NOT NULL DEFAULT now()
 );
 
+-- ============ FUNCTION ============
+-- Multa: R$ 2,00 por dia de atraso
+CREATE OR REPLACE FUNCTION biblioteca.fn_calcular_multa(
+    p_data_prevista  DATE,
+    p_data_devolucao DATE
+) RETURNS NUMERIC AS $$
+BEGIN
+    IF p_data_devolucao <= p_data_prevista THEN
+        RETURN 0;
+    END IF;
+    RETURN (p_data_devolucao - p_data_prevista) * 2.00;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- ============ PROCEDURE ============
+CREATE OR REPLACE PROCEDURE biblioteca.sp_realizar_devolucao(p_emprestimo_id INT)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_emp   biblioteca.emprestimo%ROWTYPE;
+    v_dias  INT;
+    v_valor NUMERIC;
+BEGIN
+    SELECT * INTO v_emp FROM biblioteca.emprestimo
+    WHERE id = p_emprestimo_id FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Emprestimo % nao encontrado', p_emprestimo_id;
+    END IF;
+    IF v_emp.status = 'DEVOLVIDO' THEN
+        RAISE EXCEPTION 'Emprestimo % ja foi devolvido', p_emprestimo_id;
+    END IF;
+
+    v_dias  := GREATEST(CURRENT_DATE - v_emp.data_prevista, 0);
+    v_valor := biblioteca.fn_calcular_multa(v_emp.data_prevista, CURRENT_DATE);
+
+    UPDATE biblioteca.emprestimo
+       SET data_devolucao = CURRENT_DATE, status = 'DEVOLVIDO'
+     WHERE id = p_emprestimo_id;
+
+    UPDATE biblioteca.livro
+       SET exemplares_disponiveis = exemplares_disponiveis + 1
+     WHERE id = v_emp.livro_id;
+
+    IF v_valor > 0 THEN
+        INSERT INTO biblioteca.multa (emprestimo_id, dias_atraso, valor)
+        VALUES (p_emprestimo_id, v_dias, v_valor);
+    END IF;
+END;
+$$;
+
