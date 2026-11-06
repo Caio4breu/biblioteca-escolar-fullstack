@@ -166,3 +166,38 @@ SELECT id, titulo, autor, exemplares_disponiveis
 FROM biblioteca.livro
 WHERE exemplares_disponiveis > 0;
 
+-- ============ ROLES E PERMISSOES (RBAC) ============
+CREATE ROLE rl_atendente NOLOGIN;
+CREATE ROLE rl_consulta  NOLOGIN;
+
+CREATE USER app_atendente WITH PASSWORD 'atendente123' IN ROLE rl_atendente;
+CREATE USER app_consulta  WITH PASSWORD 'consulta123'  IN ROLE rl_consulta;
+
+-- Timeout mais curto para o usuario de consulta (relatorios pesados)
+ALTER ROLE app_consulta SET statement_timeout = '5s';
+
+-- Hardening: ninguem usa o schema public nem conecta sem permissao
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON DATABASE biblioteca FROM PUBLIC;
+GRANT CONNECT ON DATABASE biblioteca TO rl_atendente, rl_consulta;
+
+-- Atendente: leitura e escrita no schema biblioteca
+GRANT USAGE ON SCHEMA biblioteca TO rl_atendente;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA biblioteca TO rl_atendente;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA biblioteca TO rl_atendente;
+GRANT EXECUTE ON ALL ROUTINES IN SCHEMA biblioteca TO rl_atendente;
+
+-- Triggers rodam com a permissao de quem altera: precisa gravar no audit
+GRANT USAGE ON SCHEMA audit TO rl_atendente;
+GRANT INSERT ON audit.log_emprestimo TO rl_atendente;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA audit TO rl_atendente;
+GRANT EXECUTE ON ALL ROUTINES IN SCHEMA audit TO rl_atendente;
+
+-- pgcrypto (criptografia do CPF)
+GRANT USAGE ON SCHEMA extensions TO rl_atendente;
+
+-- Consulta: somente leitura do catalogo
+GRANT USAGE ON SCHEMA biblioteca TO rl_consulta;
+GRANT SELECT ON biblioteca.livro TO rl_consulta;
+GRANT SELECT ON biblioteca.vw_livros_disponiveis TO rl_consulta;
+
