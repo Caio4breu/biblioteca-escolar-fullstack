@@ -152,3 +152,17 @@ CREATE TRIGGER trg_baixa_exemplar
 BEFORE INSERT ON biblioteca.emprestimo
 FOR EACH ROW EXECUTE FUNCTION biblioteca.fn_baixa_exemplar();
 
+-- ============ VIEWS ============
+CREATE OR REPLACE VIEW biblioteca.vw_emprestimos_atrasados AS
+SELECT e.id, l.titulo, r.nome AS leitor, e.data_prevista,
+       (CURRENT_DATE - e.data_prevista) AS dias_atraso
+FROM biblioteca.emprestimo e
+JOIN biblioteca.livro l  ON l.id = e.livro_id
+JOIN biblioteca.leitor r ON r.id = e.leitor_id
+WHERE e.status = 'ABERTO' AND e.data_prevista < CURRENT_DATE;
+
+CREATE OR REPLACE VIEW biblioteca.vw_livros_disponiveis AS
+SELECT id, titulo, autor, exemplares_disponiveis
+FROM biblioteca.livro
+WHERE exemplares_disponiveis > 0;
+
