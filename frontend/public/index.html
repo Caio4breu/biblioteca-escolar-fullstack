@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblioteca Escolar</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="login" class="login">
+    <div class="login-brand">
+      <h1>Biblioteca<br>Escolar</h1>
+      <p>Acervo, leitores e empréstimos em um só lugar.</p>
+    </div>
+    <form id="loginForm" class="login-form">
+      <h2>Entrar</h2>
+      <label>E-mail<input name="email" type="email" required autocomplete="username" value="admin@biblioteca.local"></label>
+      <label>Senha<input name="senha" type="password" required autocomplete="current-password"></label>
+      <button class="primary">Entrar</button>
+      <p id="loginErro" class="erro" role="alert"></p>
+    </form>
+  </section>
+
+  <div id="app" hidden>
+    <header class="top">
+      <strong class="logo">Biblioteca Escolar</strong>
+      <nav id="nav">
+        <button data-v="livros">Livros</button>
+        <button data-v="leitores">Leitores</button>
+        <button data-v="emprestimos">Empréstimos</button>
+        <button data-v="atrasados">Atrasados</button>
+      </nav>
+      <span class="user"><span id="quem"></span><button id="sair" class="ghost-light">Sair</button></span>
+    </header>
+    <main id="view"></main>
+  </div>
+
+  <div id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
