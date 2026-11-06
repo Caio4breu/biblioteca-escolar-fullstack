@@ -1,0 +1,65 @@
+:root{--red:#d6001c;--red-dark:#9e0014;--black:#000;--white:#fff;--grey:#f2f2f2;--line:#d9d9d9;--mute:#595959}
+*{box-sizing:border-box}
+html{font-size:16px}
+body{margin:0;font-family:"Segoe UI",Helvetica,Arial,sans-serif;line-height:1.5;color:var(--black);background:var(--white)}
+[hidden]{display:none!important}
+button,input,select{font:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+
+/* login */
+.login{display:grid;grid-template-columns:1.1fr 1fr;min-height:100vh}
+.login-brand{background:var(--black);color:var(--white);box-shadow:inset 1.25rem 0 0 var(--red);padding:clamp(2rem,6vw,5rem);padding-left:clamp(3.5rem,8vw,6.5rem);display:flex;flex-direction:column;justify-content:flex-end}
+.login-brand h1{margin:0;font-size:clamp(3rem,8vw,6.5rem);line-height:.95;font-weight:800;letter-spacing:-.03em}
+.login-brand p{max-width:26ch;margin:1.5rem 0 0;font-size:1.15rem}
+.login-form{display:flex;flex-direction:column;justify-content:center;gap:1rem;padding:clamp(2rem,6vw,5rem);max-width:30rem}
+.login-form h2{margin:0 0 .5rem;font-size:2rem}
+@media(max-width:760px){.login{grid-template-columns:1fr}.login-brand{min-height:40vh}}
+
+/* campos e botoes */
+label{display:flex;flex-direction:column;gap:.3rem;font-weight:600;font-size:.9rem}
+input,select{padding:.6rem .7rem;border:2px solid var(--black);border-radius:2px;background:var(--white);font-weight:400}
+input:focus,select:focus{border-color:var(--red)}
+button{cursor:pointer;border:2px solid var(--black);background:var(--white);color:var(--black);padding:.55rem 1.1rem;border-radius:2px;font-weight:700}
+button:hover{background:var(--black);color:var(--white)}
+button.primary{background:var(--red);border-color:var(--red);color:var(--white)}
+button.primary:hover{background:var(--red-dark);border-color:var(--red-dark)}
+button.small{padding:.2rem .6rem;font-size:.85rem}
+button.danger:hover{background:var(--red);border-color:var(--red)}
+.erro{color:var(--red);font-weight:600;min-height:1.5em;margin:0}
+
+/* topo */
+.top{display:flex;align-items:center;gap:2rem;background:var(--black);color:var(--white);padding:0 clamp(1rem,3vw,2.5rem);flex-wrap:wrap}
+.logo{font-size:1.1rem;padding:1rem 0;letter-spacing:-.01em}
+nav{display:flex;flex:1;flex-wrap:wrap}
+nav button{background:none;border:0;border-bottom:4px solid transparent;border-radius:0;color:var(--white);padding:1.05rem 1rem .9rem;font-weight:600}
+nav button:hover{background:none;color:var(--white);border-bottom-color:#666}
+nav button.on{border-bottom-color:var(--red)}
+.user{display:flex;align-items:center;gap:.8rem;font-size:.9rem}
+.ghost-light{border-color:var(--white);background:none;color:var(--white);padding:.25rem .8rem}
+.ghost-light:hover{background:var(--white);color:var(--black)}
+
+/* conteudo */
+main{max-width:70rem;margin:0 auto;padding:clamp(1.25rem,3vw,2.5rem)}
+h1.page{margin:0 0 1.5rem;font-size:2.4rem;line-height:1.1;letter-spacing:-.02em}
+.form{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;background:var(--grey);border-left:6px solid var(--red);padding:1.25rem;margin-bottom:2rem}
+.form label{flex:1 1 11rem}
+.form .actions{display:flex;gap:.5rem}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;border-top:3px solid var(--black)}
+th{text-align:left;font-size:.85rem;padding:.7rem .6rem;border-bottom:2px solid var(--black);white-space:nowrap}
+td{padding:.7rem .6rem;border-bottom:1px solid var(--line);vertical-align:middle}
+td.num,th.num{text-align:right}
+td.acoes{white-space:nowrap;text-align:right}
+td.acoes button{margin-left:.35rem}
+.tag{display:inline-block;padding:.05rem .5rem;border:2px solid var(--black);font-size:.8rem;font-weight:700}
+.tag.aberto{border-color:var(--red);color:var(--red)}
+.atraso{color:var(--red);font-weight:800}
+.vazio{padding:2.5rem 0;color:var(--mute);font-size:1.05rem}
+
+#toast{position:fixed;left:50%;bottom:1.5rem;transform:translate(-50%,200%);background:var(--black);color:var(--white);padding:.8rem 1.4rem;border-left:6px solid var(--white);font-weight:600;max-width:90vw;transition:transform .25s}
+#toast.show{transform:translate(-50%,0)}
+#toast.err{border-left-color:var(--black);background:var(--red)}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+
+.nota{margin:0 0 1.5rem;padding:.8rem 1rem;background:var(--grey);border-left:6px solid var(--black);font-weight:600}
+.nota.multa{border-left-color:var(--red)}
