@@ -116,3 +116,39 @@ BEGIN
 END;
 $$;
 
+-- ============ TRIGGERS ============
+-- 1) Auditoria de emprestimos
+CREATE OR REPLACE FUNCTION audit.fn_log_emprestimo() RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO audit.log_emprestimo (emprestimo_id, acao, status_novo)
+        VALUES (NEW.id, 'INSERT', NEW.status);
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO audit.log_emprestimo (emprestimo_id, acao, status_antigo, status_novo)
+        VALUES (NEW.id, 'UPDATE', OLD.status, NEW.status);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_audit_emprestimo
+AFTER INSERT OR UPDATE ON biblioteca.emprestimo
+FOR EACH ROW EXECUTE FUNCTION audit.fn_log_emprestimo();
+
+-- 2) Baixa de exemplar ao emprestar (bloqueia se nao houver disponivel)
+CREATE OR REPLACE FUNCTION biblioteca.fn_baixa_exemplar() RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE biblioteca.livro
+       SET exemplares_disponiveis = exemplares_disponiveis - 1
+     WHERE id = NEW.livro_id AND exemplares_disponiveis > 0;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Livro % sem exemplares disponiveis', NEW.livro_id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_baixa_exemplar
+BEFORE INSERT ON biblioteca.emprestimo
+FOR EACH ROW EXECUTE FUNCTION biblioteca.fn_baixa_exemplar();
+
